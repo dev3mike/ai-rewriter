@@ -26,6 +26,7 @@ export interface AIRequestPayload {
     role: 'system' | 'user' | 'assistant';
     content: string;
   }>;
+  max_tokens?: number;
 }
 
 export interface StreamCallbacks {

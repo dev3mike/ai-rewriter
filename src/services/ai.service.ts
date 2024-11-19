@@ -38,15 +38,12 @@ export class AIService {
       }
 
       const payload: AIRequestPayload = {
-        model: 'openai/gpt-4',
+        model: 'openai/gpt-4o-mini',
+        max_tokens: 1200,
         messages: [
           {
-            role: 'system',
-            content: settings.systemPrompt,
-          },
-          {
             role: 'user',
-            content: `Please rewrite the following text: "${text}"`,
+            content: `${settings.systemPrompt}: "${text}"`,
           },
         ],
       };
@@ -58,7 +55,6 @@ export class AIService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${settings.apiKey}`,
-          'HTTP-Referer': 'https://github.com/OpenRouterTeam/openrouter',
         },
         body: JSON.stringify({ ...payload, stream: !!callbacks }),
         signal: this.abortController.signal,
