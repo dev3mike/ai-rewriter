@@ -7,6 +7,9 @@ class ContentScript {
   private currentSelection: Selection | null = null;
   private rewrittenText: string = '';
   private originalText: string = '';
+  private isStreaming: boolean = false;
+  private streamContent: string = '';
+  private typingSpeed: number = 1; // Adjust typing speed (lower = faster)
 
   constructor() {
     this.initializeMessageListener();
@@ -81,7 +84,7 @@ class ContentScript {
     `;
 
     const title = document.createElement('div');
-    title.textContent = 'AI Suggestion';
+    title.textContent = 'AI Rewriter';
     title.style.cssText = `
       font-weight: 600;
       font-size: 16px;
@@ -190,7 +193,7 @@ class ContentScript {
     });
   }
 
-  private showSuggestionCard(text: string): void {
+  private showSuggestionCard(text: string, isStreaming: boolean = false): void {
     if (!this.suggestionCard || !this.overlay) return;
 
     // Store the text
@@ -203,9 +206,83 @@ class ContentScript {
       content.textContent = text;
     }
 
-    // Show overlay and card
-    this.overlay.style.display = 'block';
-    this.suggestionCard.style.display = 'block';
+    // Show overlay and card if not already visible
+    if (this.overlay.style.display !== 'block') {
+      this.overlay.style.display = 'block';
+      this.suggestionCard.style.display = 'block';
+    }
+  }
+
+  private startStreaming(): void {
+    if (!this.suggestionCard) return;
+
+    this.isStreaming = true;
+    this.streamContent = '';
+    this.showSuggestionCard('', true);
+
+    // Update UI for streaming state
+    const content = this.suggestionCard.querySelector('div:nth-child(2)') as HTMLDivElement;
+    if (content) {
+      content.textContent = '';
+      // Add blinking cursor effect
+      const cursor = document.createElement('span');
+      cursor.className = 'typing-cursor';
+      cursor.textContent = '|';
+      cursor.style.cssText = `
+        display: inline-block;
+        animation: blink 1s step-end infinite;
+      `;
+      content.appendChild(cursor);
+
+      // Add cursor blink animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes blink {
+          50% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  private appendStreamToken(token: string): void {
+    if (!this.suggestionCard || !this.isStreaming) return;
+
+    const content = this.suggestionCard.querySelector('div:nth-child(2)') as HTMLDivElement;
+    if (!content) return;
+
+    this.streamContent += token;
+    
+    // Remove existing cursor
+    const cursor = content.querySelector('.typing-cursor');
+    if (cursor) {
+      cursor.remove();
+    }
+
+    // Update content with new token
+    content.textContent = this.streamContent;
+
+    // Add cursor back
+    const newCursor = document.createElement('span');
+    newCursor.className = 'typing-cursor';
+    newCursor.textContent = '|';
+    content.appendChild(newCursor);
+  }
+
+  private endStreaming(): void {
+    if (!this.suggestionCard) return;
+
+    this.isStreaming = false;
+    this.rewrittenText = this.streamContent;
+
+    // Remove cursor
+    const content = this.suggestionCard.querySelector('div:nth-child(2)') as HTMLDivElement;
+    if (content) {
+      const cursor = content.querySelector('.typing-cursor');
+      if (cursor) {
+        cursor.remove();
+      }
+    }
   }
 
   private hideSuggestionCard(): void {
@@ -237,9 +314,22 @@ class ContentScript {
             this.showSuggestionCard(message.payload.text);
           }
           break;
+        case 'STREAM_START':
+          this.startStreaming();
+          break;
+        case 'STREAM_TOKEN':
+          if (message.payload.token) {
+            this.appendStreamToken(message.payload.token);
+          }
+          break;
+        case 'STREAM_END':
+          this.endStreaming();
+          break;
+        case 'STREAM_ERROR':
         case 'SHOW_ERROR':
           if (message.payload.error) {
             this.showToast(message.payload.error, true);
+            this.hideSuggestionCard();
           }
           break;
       }
