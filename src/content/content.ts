@@ -134,11 +134,7 @@ class ContentScript {
     const copyButton = this.createButton('Copy', '📋');
     copyButton.addEventListener('click', () => this.copyToClipboard());
 
-    const regenerateButton = this.createButton('Regenerate', '🔄');
-    regenerateButton.addEventListener('click', () => this.regenerateText());
-
     buttonContainer.appendChild(copyButton);
-    buttonContainer.appendChild(regenerateButton);
 
     this.suggestionCard.appendChild(header);
     this.suggestionCard.appendChild(content);
@@ -179,18 +175,6 @@ class ContentScript {
     } catch (error) {
       this.showToast('Failed to copy text', true);
     }
-  }
-
-  private regenerateText(): void {
-    if (!this.originalText) return;
-
-    // Send message to background script to regenerate
-    chrome.runtime.sendMessage({
-      type: 'REGENERATE_TEXT',
-      payload: {
-        text: this.originalText
-      }
-    });
   }
 
   private showSuggestionCard(text: string, isStreaming: boolean = false): void {
