@@ -1,5 +1,6 @@
 import { StorageService } from '../services/storage.service';
 import { Settings } from '../types';
+import './popup.css';
 
 class PopupUI {
   private storageService: StorageService;
