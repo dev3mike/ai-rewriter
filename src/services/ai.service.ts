@@ -2,7 +2,8 @@ import { AIResponse, AIRequestPayload, Settings, StreamCallbacks } from '../type
 
 export class AIService {
   private static instance: AIService;
-  private readonly API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+  private readonly OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+  private readonly OPENAPI_API_URL = 'https://api.openai.com/v1/chat/completions';
   private abortController: AbortController | null = null;
 
   private constructor() {}
@@ -16,9 +17,10 @@ export class AIService {
 
   private async getSettings(): Promise<Settings> {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(['apiKey'], (result) => {
+      chrome.storage.sync.get(['apiKey', 'provider'], (result) => {
         resolve({
           apiKey: result.apiKey || '',
+          provider: result.provider || 'openrouter',
         });
       });
     });
@@ -36,8 +38,10 @@ export class AIService {
         };
       }
 
+      const model = settings.provider === 'openrouter' ? 'openai/gpt-4o-mini' : 'gpt-4o-mini';
+
       const payload: AIRequestPayload = {
-        model: 'openai/gpt-4o-mini',
+        model,
         max_tokens: 1200,
         messages: [
           {
@@ -49,8 +53,9 @@ export class AIService {
       };
 
       this.abortController = new AbortController();
-
-      const response = await fetch(this.API_URL, {
+      
+      const API_URL = settings.provider === 'openrouter' ? this.OPENROUTER_API_URL : this.OPENAPI_API_URL;
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

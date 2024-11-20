@@ -1,10 +1,11 @@
 import { StorageService } from '../services/storage.service';
-import { Settings } from '../types';
+import { Settings, Provider } from '../types';
 import './popup.css';
 
 class PopupUI {
   private storageService: StorageService;
   private apiKeyInput: HTMLInputElement;
+  private providerSelect: HTMLSelectElement;
   private saveButton: HTMLButtonElement;
   private resetButton: HTMLButtonElement;
   private statusElement: HTMLDivElement;
@@ -12,6 +13,7 @@ class PopupUI {
   constructor() {
     this.storageService = StorageService.getInstance();
     this.apiKeyInput = document.getElementById('apiKey') as HTMLInputElement;
+    this.providerSelect = document.getElementById('provider') as HTMLSelectElement;
     this.saveButton = document.getElementById('saveBtn') as HTMLButtonElement;
     this.resetButton = document.getElementById('resetBtn') as HTMLButtonElement;
     this.statusElement = document.getElementById('status') as HTMLDivElement;
@@ -23,6 +25,7 @@ class PopupUI {
   private async initializeUI(): Promise<void> {
     const settings = await this.storageService.getSettings();
     this.apiKeyInput.value = settings.apiKey;
+    this.providerSelect.value = settings.provider || 'openrouter';
   }
 
   private setupEventListeners(): void {
@@ -32,33 +35,29 @@ class PopupUI {
 
   private async saveSettings(): Promise<void> {
     const settings: Settings = {
-      apiKey: this.apiKeyInput.value.trim(),
+      apiKey: this.apiKeyInput.value,
+      provider: this.providerSelect.value as Provider
     };
 
     try {
       await this.storageService.saveSettings(settings);
-      this.showStatus('Settings saved successfully!', false);
+      this.showStatus('Settings saved successfully!', 'success');
     } catch (error) {
-      this.showStatus('Failed to save settings. Please try again.', true);
+      this.showStatus('Failed to save settings', 'error');
     }
   }
 
   private async resetSettings(): Promise<void> {
-    try {
-      await this.storageService.clearSettings();
-      const settings = await this.storageService.getSettings();
-      this.apiKeyInput.value = settings.apiKey;
-      this.showStatus('Settings reset successfully!', false);
-    } catch (error) {
-      this.showStatus('Failed to reset settings. Please try again.', true);
-    }
+    this.apiKeyInput.value = '';
+    this.providerSelect.value = 'openrouter';
+    await this.saveSettings();
   }
 
-  private showStatus(message: string, isError: boolean): void {
+  private showStatus(message: string, type: 'success' | 'error'): void {
     this.statusElement.textContent = message;
-    this.statusElement.className = 'status ' + (isError ? 'error' : 'success');
-
+    this.statusElement.className = `status ${type}`;
     setTimeout(() => {
+      this.statusElement.textContent = '';
       this.statusElement.className = 'status';
     }, 3000);
   }

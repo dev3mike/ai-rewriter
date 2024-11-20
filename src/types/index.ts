@@ -1,5 +1,8 @@
+export type Provider = 'openrouter' | 'openapi';
+
 export interface Settings {
   apiKey: string;
+  provider: Provider;
 }
 
 export interface AIResponse {
