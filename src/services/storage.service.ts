@@ -14,10 +14,9 @@ export class StorageService {
 
   public async getSettings(): Promise<Settings> {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(['apiKey', 'systemPrompt'], (result) => {
+      chrome.storage.sync.get(['apiKey'], (result) => {
         resolve({
           apiKey: result.apiKey || '',
-          systemPrompt: result.systemPrompt || 'You are a helpful assistant that rewrites text to make it better while maintaining the original meaning.',
         });
       });
     });

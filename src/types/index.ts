@@ -1,6 +1,5 @@
 export interface Settings {
   apiKey: string;
-  systemPrompt: string;
 }
 
 export interface AIResponse {

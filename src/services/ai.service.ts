@@ -16,10 +16,9 @@ export class AIService {
 
   private async getSettings(): Promise<Settings> {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(['apiKey', 'systemPrompt'], (result) => {
+      chrome.storage.sync.get(['apiKey'], (result) => {
         resolve({
           apiKey: result.apiKey || '',
-          systemPrompt: result.systemPrompt || 'You are a helpful assistant that rewrites text to make it better while maintaining the original meaning.',
         });
       });
     });
@@ -43,7 +42,8 @@ export class AIService {
         messages: [
           {
             role: 'user',
-            content: `${settings.systemPrompt}: "${text}"`,
+            content: `refine it in basic english and only return the text: 
+            ${text}`,
           },
         ],
       };

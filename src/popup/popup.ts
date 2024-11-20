@@ -4,7 +4,6 @@ import { Settings } from '../types';
 class PopupUI {
   private storageService: StorageService;
   private apiKeyInput: HTMLInputElement;
-  private systemPromptInput: HTMLTextAreaElement;
   private saveButton: HTMLButtonElement;
   private resetButton: HTMLButtonElement;
   private statusElement: HTMLDivElement;
@@ -12,7 +11,6 @@ class PopupUI {
   constructor() {
     this.storageService = StorageService.getInstance();
     this.apiKeyInput = document.getElementById('apiKey') as HTMLInputElement;
-    this.systemPromptInput = document.getElementById('systemPrompt') as HTMLTextAreaElement;
     this.saveButton = document.getElementById('saveBtn') as HTMLButtonElement;
     this.resetButton = document.getElementById('resetBtn') as HTMLButtonElement;
     this.statusElement = document.getElementById('status') as HTMLDivElement;
@@ -24,7 +22,6 @@ class PopupUI {
   private async initializeUI(): Promise<void> {
     const settings = await this.storageService.getSettings();
     this.apiKeyInput.value = settings.apiKey;
-    this.systemPromptInput.value = settings.systemPrompt;
   }
 
   private setupEventListeners(): void {
@@ -35,7 +32,6 @@ class PopupUI {
   private async saveSettings(): Promise<void> {
     const settings: Settings = {
       apiKey: this.apiKeyInput.value.trim(),
-      systemPrompt: this.systemPromptInput.value.trim(),
     };
 
     try {
@@ -51,7 +47,6 @@ class PopupUI {
       await this.storageService.clearSettings();
       const settings = await this.storageService.getSettings();
       this.apiKeyInput.value = settings.apiKey;
-      this.systemPromptInput.value = settings.systemPrompt;
       this.showStatus('Settings reset successfully!', false);
     } catch (error) {
       this.showStatus('Failed to reset settings. Please try again.', true);
