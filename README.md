@@ -1,12 +1,12 @@
 # AI Rewriter Chrome Extension
 
-A Chrome extension that uses AI to rewrite selected text using the OpenRouter API.
+A Chrome extension that uses AI to rewrite selected text using either OpenAI or OpenRouter API.
 
 ## Features
 
 - Right-click on selected text to rewrite it using AI
-- Customizable system prompt
-- Modern and clean UI
+- Support for multiple AI providers (OpenAI and OpenRouter)
+- Modern dark mode UI
 - Secure API key storage
 - Toast notifications for feedback
 
@@ -36,11 +36,15 @@ npm run build
 ## Usage
 
 1. Click the extension icon to open settings
-2. Enter your OpenRouter API key
-3. (Optional) Customize the system prompt
+2. Select your preferred provider (OpenAI or OpenRouter)
+3. Enter your API key for the selected provider
 4. Select any text on a webpage
 5. Right-click and select "AI Rewriter | Rewrite it"
 6. The selected text will be replaced with the AI-generated version
+
+### API Keys
+- For OpenRouter: Get your API key from [OpenRouter](https://openrouter.ai/)
+- For OpenAI: Get your API key from [OpenAI Platform](https://platform.openai.com/)
 
 ## Project Structure
 
@@ -48,20 +52,15 @@ npm run build
 src/
 ├── background/     # Background script
 ├── content/        # Content script
-├── popup/          # Extension popup UI
-├── services/       # Shared services
-└── types/          # TypeScript types
+├── popup/         # Extension popup UI
+├── services/      # Shared services
+└── types/         # TypeScript type definitions
 ```
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT
-# ai-rewriter
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
