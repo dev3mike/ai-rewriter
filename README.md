@@ -1,4 +1,5 @@
 # AI Rewriter Chrome Extension
+![AI Rewriter Demo](demo.gif)
 
 A Chrome extension that uses AI to rewrite selected text using either OpenAI or OpenRouter API.
 
